@@ -53,15 +53,13 @@ void find(char *path, char *pattern)
         return;
     }
 
+    if (is_match(fmtname(path), pattern))
+    {
+        printf("%s\n", path);
+    }
+
     switch (st.type)
     {
-        case T_FILE:
-            if (is_match(fmtname(path), pattern))
-            {
-                printf("%s\n", path);
-            }
-            break;
-
         case T_DIR:
             if (strlen(path) + 1 + DIRSIZ + 1 > sizeof buf)
             {
@@ -71,21 +69,16 @@ void find(char *path, char *pattern)
             strcpy(buf, path);
             p = buf + strlen(buf);
             *p++ = '/';
+
+            *p = 0;
             while (read(fd, &de, sizeof(de)) == sizeof(de))
             {
                 if (de.inum == 0)
                     continue;
+                if (strcmp(de.name, ".") == 0 || strcmp(de.name, "..") == 0)
+                    continue;
                 memmove(p, de.name, DIRSIZ);
                 p[DIRSIZ] = 0;
-                if (stat(buf, &st) < 0)
-                {
-                    printf("find: cannot stat %s\n", buf);
-                    continue;
-                }
-                if (is_match(fmtname(buf), pattern))
-                {
-                    printf("%s\n", buf);
-                }
                 find(buf, pattern);
             }
             break;

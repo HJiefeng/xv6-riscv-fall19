@@ -96,6 +96,7 @@ int main(int argc, char *argv[])
             write(right_fds[WRITE_SIDE], &i, sizeof(i));
         }
         close(right_fds[WRITE_SIDE]);
+        wait();
     }
 
     exit();
